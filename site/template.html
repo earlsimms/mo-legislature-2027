@@ -1,0 +1,192 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Missouri General Assembly Bill Tracker | Missouri Strategies</title>
+<style>
+:root{--r:#c8102e;--d:#0b5ed7;--navy:#0b3d6b;--red:#a51c36;--bg:#f5f6f8;--card:#fff;--ink:#111;--mute:#4b5563;--line:#e5e7eb;--chip:#f3f4f6}
+*{box-sizing:border-box}body{margin:0;font:14px/1.4 system-ui,Segoe UI,Arial;background:var(--bg);color:var(--ink)}
+a{color:#1e3a8a}
+header{background:var(--navy);border-bottom:4px solid var(--red);color:#fff;padding:10px 16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+header h1{font-size:18px;margin:0}#gen{font-size:12px;opacity:.9}
+header button{cursor:pointer;border:0;border-radius:14px;padding:5px 12px;font-weight:600;background:#fff;color:#111}
+#preview{background:#7c2d12;color:#fff;padding:8px 16px;font-weight:600;display:none}
+.tallies{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;padding:12px 16px 0}
+.tally{background:var(--card);border-radius:8px;padding:10px 12px;box-shadow:0 1px 2px #0002}
+.tally b{display:block;font-size:22px}.tally span{font-size:12px;color:var(--mute)}
+.live{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 16px 0;font-size:13px}
+.live .lab{font-weight:700;margin-right:2px}
+.wl{display:inline-flex;align-items:center;gap:4px;border:1px solid #c7d2fe;background:#eef2ff;color:#1e3a8a;border-radius:14px;padding:3px 10px;text-decoration:none;font-size:12px;font-weight:600;white-space:nowrap}
+.wl.audio{border-color:#bbf7d0;background:#f0fdf4;color:#065f46}.wl.arch{border-color:#e5e7eb;background:#fff;color:#374151}
+nav{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px}
+nav button{border:1px solid #ccc;background:#fff;border-radius:16px;padding:5px 12px;cursor:pointer;color:#111}
+nav button.on{background:#111827;color:#fff}nav button .n{opacity:.7;font-size:12px;margin-left:3px}
+.controls{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px 8px;align-items:center}
+.controls input,.controls select{padding:6px;border:1px solid #bbb;border-radius:6px;background:#fff;color:#111;max-width:230px}
+.controls input#q{flex:1;min-width:220px;max-width:none}
+.controls label{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.controls label input{margin:0}
+#count{font-size:12px;color:var(--mute);padding:0 16px 6px}
+#note{font-size:12px;color:#7c2d12;padding:0 16px 6px}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:10px;padding:4px 16px 16px}
+.bill{background:var(--card);border-radius:8px;padding:10px 12px;box-shadow:0 1px 2px #0002;border-left:5px solid #9ca3af;display:flex;flex-direction:column;gap:5px;min-width:0}
+.bill.R{border-left-color:var(--r)}.bill.D{border-left-color:var(--d)}.bill.key{outline:2px solid #fb923c;outline-offset:1px}
+.bill h4{margin:0;font-size:15px;display:flex;justify-content:space-between;align-items:center;gap:6px}
+.bill h4 a{color:inherit;text-decoration:none}.bill h4 a:hover{text-decoration:underline}
+.st{font-weight:700;font-size:13px}.ttl{font-size:12px;color:var(--mute)}
+.meta{font-size:12px;color:#1f2937}.meta b{font-weight:600}
+.badges{display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.badge{font-size:11px;padding:2px 7px;border-radius:10px;white-space:nowrap;font-weight:600;background:#e5e7eb;color:#111}
+.b-chg{background:#fde68a;color:#78350f}.b-signed{background:#065f46;color:#fff}.b-veto{background:#991b1b;color:#fff}.b-tafp{background:#1f2937;color:#fff}.b-dead{background:#e5e7eb;color:#6b7280}
+.kt{font:600 11px system-ui;border-radius:10px;padding:1px 7px;cursor:pointer;border:1px dashed #9ca3af;background:transparent;color:#6b7280}
+.kt.on{background:#fdba74;border:1px solid #c2410c;color:#7c2d12}
+.prog{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;margin:2px 0 0}
+.prog i{height:8px;background:#e5e7eb;border-radius:2px;display:block}.prog i.f{background:var(--navy)}.prog i.cur{background:#2563eb}
+.prog.signed i.f,.prog.signed i.cur{background:#059669}.prog.vetoed i.cur{background:#dc2626}.prog.dead i.f,.prog.dead i.cur{background:#9ca3af}
+.pl{display:flex;justify-content:space-between;font-size:10px;color:var(--mute)}
+.hear{font-size:12px;background:#eef2ff;border:1px dashed #6366f1;border-radius:4px;padding:5px 6px}
+.sum{font-size:12px;background:#f0fdf4;border:1px solid #86efac;border-radius:4px;padding:5px 6px}.sum b{color:#065f46}
+.sum.off{background:#f9fafb;border-color:#e5e7eb}.sum.off b{color:#374151}
+.chips{display:flex;flex-wrap:wrap;gap:4px}.chip{font-size:11px;background:var(--chip);border-radius:10px;padding:1px 7px;color:#374151;cursor:pointer;border:0}
+.links{display:flex;flex-wrap:wrap;gap:6px 10px;font-size:12px;margin-top:auto;padding-top:4px;border-top:1px solid var(--line)}
+.osum{font-size:12.5px;background:#f8fafc;border:1px solid #cbd5e1;border-left:3px solid var(--navy);border-radius:4px;padding:6px 8px}
+.osum .oh{display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap;margin-bottom:3px}.osum .oh b{color:var(--navy)}.osum .ov{font-size:11px;color:var(--mute)}
+.osum .otext p{margin:0 0 6px;line-height:1.45}.osum .oact{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:4px;font-size:12px}
+.sbtn{border:1px solid #94a3b8;background:#fff;color:#0b3d6b;border-radius:12px;padding:2px 10px;cursor:pointer;font-weight:600;font-size:12px}
+html.dark .osum{background:#111827;border-color:#334155;border-left-color:#60a5fa}html.dark .osum .oh b{color:#93c5fd}html.dark .sbtn{background:#1a212b;color:#93c5fd;border-color:#475569}
+#more{display:none;margin:0 16px 20px;padding:8px 16px;border-radius:16px;border:1px solid #bbb;background:#fff;cursor:pointer}
+#cal{padding:4px 16px 16px;display:none}
+.day{background:var(--card);border-radius:8px;box-shadow:0 1px 2px #0002;margin-bottom:10px;padding:10px 12px}
+.day h3{margin:0 0 6px;font-size:15px}.hrow{display:grid;grid-template-columns:110px 1fr;gap:8px;border-top:1px solid var(--line);padding:7px 0;font-size:13px}
+.hrow .bl{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}.hrow .bl a{font-size:11px;background:var(--chip);border-radius:10px;padding:1px 7px;text-decoration:none;color:#111}
+.hrow .bl a.k{background:#fdba74;color:#7c2d12}
+.empty{background:var(--card);border-radius:8px;padding:14px;box-shadow:0 1px 2px #0002;color:#374151}
+#sources{padding:8px 16px 30px;font-size:12px}#sources table{border-collapse:collapse;width:100%;background:var(--card)}
+#sources td,#sources th{border:1px solid #ddd;padding:4px 6px;text-align:left;vertical-align:top}.ok{color:#065f46;font-weight:700}.fail{color:#b91c1c;font-weight:700}
+@media(max-width:600px){nav,.controls,#grid,.tallies,.live{padding-left:10px;padding-right:10px}.controls select{max-width:none;flex:1 1 45%}.hrow{grid-template-columns:1fr}}
+html.dark{--bg:#0f141b;--card:#1a212b;--ink:#e5e7eb;--mute:#94a3b8;--line:#334155;--chip:#273241;color-scheme:dark}
+html.dark a{color:#93c5fd}html.dark .meta{color:#cbd5e1}html.dark .bill.key{outline-color:#f97316}
+html.dark nav button,html.dark .controls input,html.dark .controls select,html.dark #more{background:#1a212b;color:#e5e7eb;border-color:#475569}
+html.dark nav button.on{background:#e5e7eb;color:#111}
+html.dark .badge{background:#334155;color:#e5e7eb}html.dark .b-chg{background:#facc15;color:#422006}html.dark .b-signed{background:#047857;color:#fff}html.dark .b-veto{background:#b91c1c;color:#fff}html.dark .b-tafp{background:#e5e7eb;color:#111}html.dark .b-dead{background:#273241;color:#94a3b8}
+html.dark .kt{color:#cbd5e1;border-color:#64748b}html.dark .kt.on{background:#fdba74;color:#7c2d12;border-color:#c2410c}
+html.dark .prog i{background:#334155}html.dark .prog i.f{background:#60a5fa}html.dark .prog i.cur{background:#93c5fd}
+html.dark .prog.signed i.f,html.dark .prog.signed i.cur{background:#34d399}html.dark .prog.dead i.f,html.dark .prog.dead i.cur{background:#64748b}
+html.dark .hear{background:#1e1b4b;border-color:#818cf8}html.dark .sum{background:#052e1a;border-color:#15803d}html.dark .sum b{color:#86efac}
+html.dark .sum.off{background:#111827;border-color:#334155}html.dark .sum.off b{color:#cbd5e1}
+html.dark .chip,html.dark .hrow .bl a{color:#cbd5e1}html.dark .hrow .bl a.k{background:#fdba74;color:#7c2d12}
+html.dark .wl{background:#1e1b4b;border-color:#4338ca;color:#c7d2fe}html.dark .wl.audio{background:#052e1a;border-color:#15803d;color:#86efac}html.dark .wl.arch{background:#1a212b;border-color:#475569;color:#cbd5e1}
+html.dark #sources td,html.dark #sources th{border-color:#334155}html.dark .ok{color:#34d399}html.dark .fail{color:#f87171}
+html.dark .empty{color:#cbd5e1}html.dark #note{color:#fdba74}
+</style>
+<script>(function(){var k="mo-leg-dark",s=localStorage.getItem(k),u=(location.search.match(/theme=(dark|light)/)||[])[1],d=u?u==="dark":s?s==="1":matchMedia("(prefers-color-scheme: dark)").matches;function a(v){document.documentElement.classList.toggle("dark",v);var b=document.getElementById("darkbtn");if(b)b.textContent=v?"☀️ Light mode":"🌙 Dark mode"}a(d);document.addEventListener("DOMContentLoaded",function(){a(d);document.getElementById("darkbtn").onclick=function(){d=!d;localStorage.setItem(k,d?"1":"0");a(d)}})})()</script>
+</head><body>
+<header><div style="display:flex;align-items:center;gap:12px"><img src="__LOGO__" alt="Missouri Strategies" style="height:52px;background:#fff;border-radius:6px;padding:3px"><div><div style="font:600 12px Georgia,serif;letter-spacing:3px;opacity:.85">MISSOURI STRATEGIES</div><h1 id="title">Missouri General Assembly Bill Tracker</h1></div></div>
+<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><div id="gen">Loading…</div><button id="darkbtn">🌙 Dark mode</button></div></header>
+<div id="preview"></div>
+<section class="tallies" id="tallies"></section>
+<div class="live" id="live"></div>
+<nav id="tabs"></nav>
+<div class="controls" id="controls">
+<input id="q" type="search" placeholder="Search bill number, title, sponsor, topic…" aria-label="Search bills">
+<select id="fsp" aria-label="Sponsor"><option value="">All sponsors</option></select>
+<select id="fcm" aria-label="Committee"><option value="">All committees</option></select>
+<select id="ftp" aria-label="Topic"><option value="">All topics</option></select>
+<select id="fst" aria-label="Status"><option value="">All statuses</option></select>
+<select id="fpt" aria-label="Party"><option value="">Both parties</option><option value="R">Republican sponsor</option><option value="D">Democratic sponsor</option></select>
+<select id="srt" aria-label="Sort"><option value="num">Sort: bill number</option><option value="recent">Sort: latest action</option><option value="stage">Sort: furthest along</option></select>
+<label><input type="checkbox" id="fchg"> Changed today</label>
+</div>
+<div id="note"></div><div id="count"></div>
+<section id="grid"></section><button id="more">Show more bills</button>
+<section id="cal"></section>
+<section id="sources"></section>
+<script>
+var OPEN={},FULL=null,FULLP=null,D,KEYS,TAB=((location.search.match(/tab=(\w+)/)||[])[1])||"key",SHOWN=120,CFG;
+var MON=["January","February","March","April","May","June","July","August","September","October","November","December"];
+function fd(s){if(!s)return"";var m=/^(\d{4})-(\d{2})-(\d{2})/.exec(s);if(m)return MON[+m[2]-1]+" "+(+m[3])+", "+m[1];return s}
+function ct(iso){var d=new Date(iso);var p=new Intl.DateTimeFormat("en-US",{timeZone:"America/Chicago",year:"numeric",month:"long",day:"numeric",hour:"numeric",minute:"2-digit"}).formatToParts(d),o={};p.forEach(function(x){o[x.type]=x.value});return o.month+" "+o.day+", "+o.year+" at "+o.hour+":"+o.minute+" "+o.dayPeriod+" CT"}
+function ctDay(d){var p=new Intl.DateTimeFormat("en-CA",{timeZone:"America/Chicago"}).format(d||new Date());return p}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function tc(s){if(!s)return"";if(s!==s.toUpperCase())return s;return s.toLowerCase().replace(/\b([a-z])/g,function(m){return m.toUpperCase()}).replace(/\b(And|Of|The|For|To|In|On|Or|A)\b/g,function(m,w,i){return i?m.toLowerCase():m})}
+function loadKeys(){var s={};try{s=JSON.parse(localStorage.getItem("mo-leg-keys")||"{}")}catch(e){}s.add=s.add||[];s.del=s.del||[];return s}
+function isKey(b){if(KEYS.add.indexOf(b.id)>=0)return true;if(KEYS.del.indexOf(b.id)>=0)return false;return !!b.key}
+function toggleKey(id){var b=D.bills.find(function(x){return x.id===id});var on=isKey(b);KEYS.add=KEYS.add.filter(function(x){return x!==id});KEYS.del=KEYS.del.filter(function(x){return x!==id});
+ if(on&&b.key)KEYS.del.push(id);if(!on&&!b.key)KEYS.add.push(id);localStorage.setItem("mo-leg-keys",JSON.stringify(KEYS));tabs();render(true)}
+function changedToday(b){return b.changed_at&&ctDay(new Date(b.changed_at))===ctDay()}
+function wl(s,extra){if(!s)return"";var st=D.streams[s];if(!st)return"";return '<a class="wl '+(st.kind==="audio"?"audio":"")+'" href="'+esc(st.url)+'" target="_blank" rel="noopener">'+(st.kind==="audio"?"🎧 ":"▶ ")+esc(extra||st.label)+'</a>'}
+function spn(b){var s=b.sponsor||{};var t=(s.chamber==="Senate"?"Sen. ":"Rep. ")+esc(s.name||"");if(s.party)t+=" ("+s.party+(s.district?"-"+(+s.district):"")+")";else if(s.district)t+=" (District "+(+s.district)+")";return t}
+function badge(b){var s=b.status||"",c="";if(/vetoed in part/i.test(s))c="b-signed";else if(/veto/i.test(s))c="b-veto";else if(/^signed/i.test(s))c="b-signed";else if(/truly agreed/i.test(s))c="b-tafp";else if(/withdrawn|defeated/i.test(s))c="b-dead";return '<span class="badge '+c+'">'+esc(s)+'</span>'}
+function prog(b){var labels=D.stage_labels[b.chamber].slice();if(/JR$/.test(b.type))labels[7]="Goes to ballot";var cls=/withdrawn|defeated/i.test(b.status)?"dead":/^signed/i.test(b.status)?"signed":/veto/i.test(b.status)?"vetoed":"";
+ var h='<div class="prog '+cls+'" title="'+esc(labels.map(function(l,i){return(i+1)+". "+l}).join("\n"))+'">';for(var i=1;i<=8;i++)h+='<i class="'+(i<b.stage?"f":i===b.stage?"cur":"")+'"></i>';
+ return h+'</div><div class="pl"><span>Stage '+b.stage+' of 8: '+esc(b.stage===8?b.status:(labels[b.stage-1]||"Filed"))+'</span><span>'+esc(b.chamber)+' bill</span></div>'}
+function card(b){var k=isKey(b),h='<div class="bill '+(b.sponsor&&b.sponsor.party||"")+(k?" key":"")+'">';
+ h+='<h4><a href="'+esc(b.url)+'" target="_blank" rel="noopener">'+esc(b.label)+'</a><span class="badges">'+(changedToday(b)?'<span class="badge b-chg" title="'+esc(b.change||"Changed")+'">Changed today</span>':"")+badge(b)+'<button class="kt'+(k?" on":"")+'" data-k="'+b.id+'" title="Mark as a key bill">'+(k?"★ Key":"☆ Key")+'</button></span></h4>';
+ h+='<div class="st">'+esc(tc(b.short_title)||b.title)+'</div>';if(b.short_title)h+='<div class="ttl">'+esc(b.title)+'</div>';
+ if(b.bill_string&&b.bill_string.replace(/\s/g,"")!==b.label.replace(/\s/g,""))h+='<div class="ttl">Current version: '+esc(b.bill_string)+'</div>';
+ h+='<div class="meta"><b>Sponsor:</b> '+spn(b)+(b.cosponsors?' + '+b.cosponsors+' co-sponsor'+(b.cosponsors>1?"s":""):"")+(b.handler?' · <b>House handler:</b> '+esc(b.handler.split(",").reverse().join(" ").trim()):"")+'</div>';
+ h+=prog(b);
+ if(b.committee&&b.stage<7)h+='<div class="meta"><b>'+(b.in_committee?"In committee":"Last committee")+':</b> '+esc(b.committee_chamber)+' '+esc(b.committee)+'</div>';
+ (b.hearings||[]).forEach(function(x){h+='<div class="hear"><b>Hearing:</b> '+esc(fd(x.date)||"Date to be announced")+(x.time?", "+esc(x.time):"")+(x.room?" · "+esc(x.room):"")+(x.committee?" · "+esc(x.chamber)+" "+esc(x.committee):"")+(x.status&&!/upcoming/i.test(x.status)?" · <b>"+esc(x.status)+"</b>":"")+(x.stream?'<div style="margin-top:4px">'+wl(x.stream)+'</div>':(x.room?'<div style="margin-top:2px;opacity:.8">No live stream for this room</div>':""))+'</div>'});
+ if(b.on_calendar)h+='<div class="hear"><b>On House floor calendar:</b> '+esc(tc(b.on_calendar))+'<div style="margin-top:4px">'+wl("house_chamber_video","Watch House floor")+' '+wl("house_chamber_audio","Listen")+'</div></div>';
+ if(!(b.hearings||[]).length&&b.last_hearing)h+='<div class="meta"><b>Last hearing:</b> '+esc(fd(b.last_hearing.date))+'</div>';
+ if(b.last_action&&b.last_action.date)h+='<div class="meta"><b>Last action:</b> '+esc(fd(b.last_action.date))+' — '+esc(b.last_action.text)+'</div>';
+ if(D.show_ai&&k&&b.ai_summary)h+='<div class="sum"><b>Summary (Grok):</b> '+esc(b.ai_summary)+'</div>';
+ if(b.sum_preview){var open=OPEN[b.id],full=open&&FULL&&FULL[b.id];
+  h+='<div class="osum"><div class="oh"><b>Official summary</b><span class="ov">'+esc(b.sum_version||"Current")+' · '+(b.chamber==="House"?"Missouri House":"Missouri Senate")+'</span></div>'+
+   (full?'<div class="otext">'+full.text.split(/\n\n+/).map(function(p){return'<p>'+esc(p).replace(/\n/g,"<br>")+'</p>'}).join("")+'</div>':'<div class="oprev">'+esc(b.sum_preview)+'</div>')+
+   '<div class="oact">'+(b.sum_full_len>b.sum_preview.length+5||open?'<button class="sbtn" data-s="'+b.id+'" aria-expanded="'+(open?"true":"false")+'">'+(open?(full?"Show less ▲":"Loading…"):"Read full summary ▼")+'</button>':"")+
+   (b.sum_url?'<a href="'+esc(b.sum_url)+'" target="_blank" rel="noopener">'+(b.chamber==="House"?"Official summary (PDF)":"Summary on senate.mo.gov")+'</a>':"")+'</div></div>'}
+ else h+='<div class="meta" style="opacity:.75">No official summary posted yet.</div>';
+ if((b.topics||[]).length)h+='<div class="chips">'+b.topics.slice(0,4).map(function(t){return'<button class="chip" data-t="'+esc(t)+'">'+esc(t)+'</button>'}).join("")+(b.topics.length>4?'<span class="chip" style="cursor:default">+'+(b.topics.length-4)+'</span>':"")+'</div>';
+ h+='<div class="links">'+(b.text_url?'<a href="'+esc(b.text_url)+'" target="_blank" rel="noopener">📄 Bill text'+(b.text_version?" ("+esc(b.text_version)+")":"")+'</a>':"")+'<a href="'+esc(b.url)+'" target="_blank" rel="noopener">🏛 Official page</a>';
+ (b.recordings||[]).forEach(function(r){h+='<a href="'+esc(r.url)+'" target="_blank" rel="noopener">'+(r.kind==="audio"?"🎧 ":"▶ ")+esc(r.label)+(r.kind==="audio"?", "+esc(fd(r.date)):"")+'</a>'});
+ return h+'</div></div>'}
+function inTab(b){if(TAB==="key")return isKey(b);if(TAB==="house")return b.chamber==="House"&&!/JR$/.test(b.type);if(TAB==="senate")return b.chamber==="Senate"&&!/JR$/.test(b.type);if(TAB==="jr")return /JR$/.test(b.type);if(TAB==="moving")return !!b.moving;return true}
+function filtered(){var q=document.getElementById("q").value.trim().toLowerCase().replace(/\s+/g," "),sp=fsp.value,cm=fcm.value,tp=ftp.value,st=fst.value,pt=fpt.value,ch=fchg.checked;
+ var qn=q.replace(/\s/g,"");
+ var r=D.bills.filter(function(b){if(!inTab(b))return false;if(sp&&(b.sponsor||{}).name!==sp)return false;if(cm&&b.committee!==cm)return false;if(tp&&(b.topics||[]).indexOf(tp)<0)return false;if(st&&b.status!==st)return false;if(pt&&(b.sponsor||{}).party!==pt)return false;if(ch&&!changedToday(b))return false;
+  if(q){var hay=(b.label+" "+b.id+" "+(b.bill_string||"")+" "+(b.short_title||"")+" "+b.title+" "+((b.sponsor||{}).name||"")+" "+(b.topics||[]).join(" ")+" "+(b.committee||"")).toLowerCase();if(hay.indexOf(q)<0&&hay.replace(/\s/g,"").indexOf(qn)<0)return false}return true});
+ var s=srt.value;if(s==="recent")r.sort(function(a,b){return((b.last_action||{}).date||"").localeCompare((a.last_action||{}).date||"")});else if(s==="stage")r.sort(function(a,b){return b.stage-a.stage||((b.last_action||{}).date||"").localeCompare((a.last_action||{}).date||"")});
+ return r}
+function render(keep){var cal=document.getElementById("cal"),g=document.getElementById("grid"),c=document.getElementById("controls");
+ if(TAB==="cal"){g.style.display="none";c.style.display="none";more.style.display="none";document.getElementById("count").textContent="";document.getElementById("note").textContent="";cal.style.display="block";calendar();return}
+ cal.style.display="none";g.style.display="";c.style.display="";if(!keep)SHOWN=120;var r=filtered();
+ document.getElementById("note").textContent=TAB==="moving"?(D.moving_note||"")+" Includes bills with an upcoming hearing, on a floor calendar, or with an action in the last 7 days.":TAB==="key"&&!r.length?"":"";
+ document.getElementById("count").textContent=r.length.toLocaleString()+" bill"+(r.length===1?"":"s")+(r.length>SHOWN?" · showing "+SHOWN:"");
+ g.innerHTML=r.length?r.slice(0,SHOWN).map(card).join(""):'<div class="empty">'+(TAB==="key"?"No key bills yet. Tap ☆ Key on any bill to add it here.":"No bills match these filters.")+'</div>';
+ more.style.display=r.length>SHOWN?"block":"none"}
+function calendar(){var cal=document.getElementById("cal"),hs=D.hearings||[],keys={};D.bills.forEach(function(b){if(isKey(b))keys[b.id]=1});
+ var h='<div class="day"><h3>Floor sessions</h3><div class="live" style="padding:0">'+wl("house_chamber_video")+wl("house_chamber_audio")+wl("senate_chamber_audio")+'<a class="wl arch" href="'+esc(D.archives.house_video.url)+'" target="_blank" rel="noopener">🗂 '+esc(D.archives.house_video.label)+'</a><a class="wl arch" href="'+esc(D.archives.senate_audio.url)+'" target="_blank" rel="noopener">🗂 '+esc(D.archives.senate_audio.label)+'</a></div><div class="meta" style="margin-top:6px">Live links play only while the chamber or room is in session. The Senate streams audio only; the House streams video.</div></div>';
+ var today=ctDay(),end=new Date(Date.now()+8*864e5),endS=ctDay(end),by={};
+ hs.forEach(function(x){var d=x.date||"TBA";if(d!=="TBA"&&(d<today||d>endS))return;(by[d]=by[d]||[]).push(x)});
+ var days=Object.keys(by).sort();
+ if(!days.length)h+='<div class="empty"><b>No committee hearings are posted for the week ahead.</b><br>The House and Senate post hearing schedules about a week in advance during session. The 2027 session begins January 6, 2027; this calendar fills in automatically from <a href="https://house.mo.gov/HearingsTimeOrder.aspx" target="_blank" rel="noopener">House hearings</a> and <a href="https://www.senate.mo.gov/HearingsSchedule/hrings.htm" target="_blank" rel="noopener">Senate hearings</a>.</div>';
+ days.forEach(function(d){h+='<div class="day"><h3>'+(d==="TBA"?"Date to be announced":new Date(d+"T12:00:00").toLocaleDateString("en-US",{weekday:"long"})+", "+fd(d))+'</h3>';
+  by[d].forEach(function(x){h+='<div class="hrow"><div><b>'+esc(x.time||"")+'</b><div class="ttl">'+esc(x.chamber)+'</div></div><div><b>'+esc(x.committee)+'</b>'+(x.status&&!/upcoming/i.test(x.status)?' <span class="badge">'+esc(x.status)+'</span>':"")+'<div class="ttl">'+esc(x.room)+'</div>'+(x.stream?'<div style="margin-top:4px">'+wl(x.stream)+'</div>':'<div class="ttl">No live stream for this room</div>')+((x.bills||[]).length?'<div class="bl">'+x.bills.map(function(y){var b=D.bills.find(function(z){return z.id===y.id});return'<a class="'+(keys[y.id]?"k":"")+'" href="'+esc(b?b.url:"#")+'" target="_blank" rel="noopener" title="'+esc(b?(tc(b.short_title)||b.title):"")+'">'+(keys[y.id]?"★ ":"")+esc(y.id.replace(/([A-Z]+)(\d+)/,"$1 $2"))+(y.exec?" (exec.)":"")+'</a>'}).join("")+'</div>':"")+(x.note?'<div class="ttl" style="margin-top:3px">'+esc(x.note)+'</div>':"")+'</div></div>'});
+  h+='</div>'});
+ cal.innerHTML=h}
+function tabs(){var n={key:0,house:0,senate:0,jr:0,moving:0};D.bills.forEach(function(b){if(isKey(b))n.key++;if(/JR$/.test(b.type))n.jr++;else if(b.chamber==="House")n.house++;else n.senate++;if(b.moving)n.moving++});
+ var hc=(D.hearings||[]).length;var T=[["key","★ Key bills",n.key],["house","House bills",n.house],["senate","Senate bills",n.senate],["jr","Joint resolutions",n.jr],["moving","Moving this week",n.moving],["cal","Hearings calendar",hc]];
+ document.getElementById("tabs").innerHTML=T.map(function(t){return'<button data-tab="'+t[0]+'" class="'+(TAB===t[0]?"on":"")+'">'+t[1]+'<span class="n">'+t[2].toLocaleString()+'</span></button>'}).join("")}
+function opts(id,vals){var el=document.getElementById(id),first=el.options[0].outerHTML;el.innerHTML=first+vals.map(function(v){return'<option>'+esc(v)+'</option>'}).join("")}
+function init(d){D=d;CFG=d.config;KEYS=loadKeys();
+ document.getElementById("title").textContent=(CFG.title||"Bill Tracker")+" · "+(CFG.session_label||"");
+ document.getElementById("gen").textContent="Updated "+ct(d.generated);
+ if(CFG.preview){var p=document.getElementById("preview");p.style.display="block";p.textContent="PREVIEW · "+(CFG.preview_note||"")}
+ var B=d.bills,c=function(f){return B.filter(f).length};
+ var tl=[["Bills filed",B.length],["In committee",c(function(b){return b.in_committee&&b.stage<7})],["Passed first chamber",c(function(b){return b.stage>=4})],["Truly agreed & finally passed",c(function(b){return b.stage>=7})],["Signed by Governor",c(function(b){return /^signed/i.test(b.status)})],["Changed today",c(changedToday)]];
+ document.getElementById("tallies").innerHTML=tl.map(function(t){return'<div class="tally"><b>'+t[1].toLocaleString()+'</b><span>'+t[0]+'</span></div>'}).join("");
+ document.getElementById("live").innerHTML='<span class="lab">Watch / listen live:</span>'+wl("house_chamber_video","House floor video")+wl("house_chamber_audio","House floor audio")+wl("senate_chamber_audio","Senate floor audio")+'<a class="wl arch" href="'+esc(d.archives.house_video.url)+'" target="_blank" rel="noopener">🗂 House video archive</a><a class="wl arch" href="'+esc(d.archives.senate_audio.url)+'" target="_blank" rel="noopener">🗂 Senate audio archive</a>';
+ var u=function(f){var s={};B.forEach(function(b){[].concat(f(b)).forEach(function(v){if(v)s[v]=1})});return Object.keys(s).sort()};
+ opts("fsp",u(function(b){return(b.sponsor||{}).name}));opts("fcm",u(function(b){return b.committee}));opts("ftp",u(function(b){return b.topics||[]}));opts("fst",u(function(b){return b.status}));
+ var op=(location.search.match(/open=([A-Z]+\d+)/)||[])[1];if(op&&!OPEN[op]){OPEN[op]=1;FULLP=fetch("data/summaries-full.json?"+d.generated).then(function(r){return r.json()});FULLP.then(function(j){FULL=j;render(true)})}
+ tabs();render();
+ document.getElementById("sources").innerHTML='<h3 style="margin:6px 0">Data sources</h3><table><tr><th>Source</th><th>Status</th><th>Detail</th><th>Checked</th></tr>'+d.sources.map(function(s){return'<tr><td>'+esc(s.name.replace(/_/g," "))+'</td><td class="'+(s.ok?"ok":"fail")+'">'+(s.ok?"OK":"Failed")+'</td><td>'+esc(s.detail)+'</td><td>'+esc(ct(s.at))+'</td></tr>'}).join("")+'</table><p>Bill data comes from the official <a href="https://house.mo.gov" target="_blank" rel="noopener">Missouri House</a> XML downloads and <a href="https://www.senate.mo.gov" target="_blank" rel="noopener">Missouri Senate</a> bill tracking pages. Key bills are saved in this browser; the default list is set in config.json.</p>'}
+document.addEventListener("click",function(e){var t=e.target.closest("[data-tab]");if(t){TAB=t.dataset.tab;tabs();render();return}var k=e.target.closest("[data-k]");if(k){toggleKey(k.dataset.k);return}var sb=e.target.closest("[data-s]");if(sb){var id=sb.dataset.s;if(OPEN[id]){delete OPEN[id];render(true);return}OPEN[id]=1;render(true);
+  if(!FULL){FULLP=FULLP||fetch("data/summaries-full.json?"+D.generated).then(function(r){return r.json()});FULLP.then(function(j){FULL=j;render(true)}).catch(function(){delete OPEN[id];FULLP=null;render(true);alert("Could not load the full summary. Use the official summary link instead.")})}return}
+ var c=e.target.closest("[data-t]");if(c){ftp.value=c.dataset.t;if(TAB==="key"||TAB==="cal"){TAB="all"}render();tabs();window.scrollTo({top:document.getElementById("tabs").offsetTop,behavior:"smooth"})}});
+var fsp,fcm,ftp,fst,fpt,fchg,srt,more;
+document.addEventListener("DOMContentLoaded",function(){fsp=document.getElementById("fsp");fcm=document.getElementById("fcm");ftp=document.getElementById("ftp");fst=document.getElementById("fst");fpt=document.getElementById("fpt");fchg=document.getElementById("fchg");srt=document.getElementById("srt");more=document.getElementById("more");
+ ["q","fsp","fcm","ftp","fst","fpt","fchg","srt"].forEach(function(id){document.getElementById(id).addEventListener(id==="q"?"input":"change",function(){if(TAB==="cal")TAB="key";render()})});
+ more.onclick=function(){SHOWN+=120;render(true)};
+ fetch("data/bills.json?"+Date.now()).then(function(r){return r.json()}).then(init).catch(function(e){document.getElementById("gen").textContent="Could not load data: "+e});
+ setInterval(function(){fetch("data/bills.json?"+Date.now()).then(function(r){return r.json()}).then(function(d){if(d.generated!==D.generated){var t=TAB;init(d);TAB=t;tabs();render(true)}}).catch(function(){})},15*60*1000)});
+</script></body></html>
