@@ -1,0 +1,14 @@
+{
+  "_comment": "Edit this file to switch sessions or change key bills. For 2027 set session_year to 2027 and preview to false (prefiling opens December 1, 2026).",
+  "session_year": 2026,
+  "session_code": "R",
+  "title": "Missouri General Assembly Bill Tracker",
+  "session_label": "2026 Regular Session",
+  "preview": true,
+  "preview_note": "Preview built with real 2026 regular-session bills. Switches to 2027 bills when prefiling opens December 1, 2026.",
+  "bill_types": {"House": ["HB", "HJR"], "Senate": ["SB", "SJR"]},
+  "key_bills": ["SB1442", "HB2872"],
+  "moving_window_days": 7,
+  "summaries": {"_comment": "Optional Grok summaries for key bills (needs XAI_API_KEY). Off by default; the official chamber summary is always shown.", "enabled": false, "show_on_cards": false, "model": "grok-4", "max_bills": 60},
+  "workers": {"house": 6, "senate": 5}
+}
