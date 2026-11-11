@@ -16,7 +16,7 @@ on:
     - cron: "17 * * 1-5 *"
     - cron: "17 13 * 12 *"
 concurrency: {group: bills, cancel-in-progress: false}
-permissions: {contents: write}
+permissions: {contents: write, pages: write}
 jobs:
   update:
     runs-on: ubuntu-latest
@@ -48,4 +48,11 @@ jobs:
           cd /tmp/out && git init -q -b gh-pages && git add -A
           git -c user.name=bills-bot -c user.email=bills-bot@users.noreply.github.com commit -qm "deploy $(date -u +%FT%TZ)"
           git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" gh-pages
+      - name: Turn on GitHub Pages (gh-pages / root) if it isn't on yet
+        if: always()
+        continue-on-error: true
+        env: {GH_TOKEN: "${{ github.token }}"}
+        run: |
+          gh api "repos/${{ github.repository }}/pages" --jq .html_url && exit 0
+          gh api -X POST "repos/${{ github.repository }}/pages" -f "source[branch]=gh-pages" -f "source[path]=/" --jq .html_url
       # Daily digest email (optional, off by default). See README "Daily digest" for how to turn it on.

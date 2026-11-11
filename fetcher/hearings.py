@@ -96,11 +96,20 @@ def parse_senate(html, year_hint):
 
 def fetch(year_hint, log):
     out = []
-    for name, url, fn in (("house_hearings", HOUSE_URL, parse_house), ("senate_hearings", SENATE_URL, parse_senate)):
-        try:
-            hs = fn(get(url), year_hint)
-            out += hs
-            log(name, True, f"{len(hs)} hearings listed")
-        except Exception as e:
-            log(name, False, str(e))
+    # house.mo.gov sometimes answers 403 to cloud (GitHub Actions) addresses; try the www host too.
+    # If both fail, House hearings still appear from each bill's "next hearing" field in the House bill XML.
+    house_urls = [HOUSE_URL, HOUSE_URL.replace("https://house.mo.gov", "https://www.house.mo.gov")]
+    for name, urls, fn in (("house_hearings", house_urls, parse_house), ("senate_hearings", [SENATE_URL], parse_senate)):
+        errs = []
+        for url in urls:
+            try:
+                hs = fn(get(url), year_hint)
+                out += hs
+                log(name, True, f"{len(hs)} hearings listed")
+                break
+            except Exception as e:
+                errs.append(str(e))
+        else:
+            note = " (House hearings are still shown from each bill's next-hearing field)" if name == "house_hearings" else ""
+            log(name, False, "; ".join(errs) + note)
     return out
