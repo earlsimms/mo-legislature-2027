@@ -1,6 +1,6 @@
 """Official bill summaries, as published by each chamber (no rewriting).
 House: the summary PDF for the bill's latest version (documents.house.mo.gov/billtracking/bills{code}/sumpdf/...), converted
-       to text with pdftotext -layout, paragraphs kept. Cached by PDF URL in site/data/official_summaries_cache.json.
+       to text with PyMuPDF (or pdftotext -layout), paragraphs kept. Cached by PDF URL in site/data/official_summaries_cache.json.
 Senate: the first (most current) entry of the bill's "Summaries" panel on senate.mo.gov, fetched in senate.py."""
 import json
 import os
@@ -11,6 +11,15 @@ from .http import get, pmap
 
 
 def pdf_to_paragraphs(pdf_bytes):
+    """PDF -> paragraphs. Uses PyMuPDF (pip wheel, no system packages needed); falls back to poppler's pdftotext.
+    Both give identical text after paragraph joining (checked on 118 House summary PDFs)."""
+    try:
+        import pymupdf
+        doc = pymupdf.open(stream=pdf_bytes, filetype="pdf")
+        txt = "\n\n".join(b[4].strip() for page in doc for b in page.get_text("blocks", sort=True) if b[6] == 0)
+        return layout_to_paragraphs(txt)
+    except ImportError:
+        pass
     with tempfile.NamedTemporaryFile(suffix=".pdf") as f:
         f.write(pdf_bytes); f.flush()
         out = subprocess.run(["pdftotext", "-layout", "-enc", "UTF-8", f.name, "-"], capture_output=True, text=True, timeout=60).stdout

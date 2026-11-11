@@ -24,18 +24,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {fetch-depth: 1}
-      - name: Install Python packages
-        run: pip install -q beautifulsoup4 lxml curl_cffi
-      - name: Install pdftotext (House summary PDFs; tolerant - if Ubuntu's mirror is down, the cached text is used and the next run retries)
-        continue-on-error: true
-        timeout-minutes: 8
-        run: |
-          command -v pdftotext && exit 0
-          for i in 1 2 3; do
-            sudo apt-get update -qq -o Acquire::Retries=3 && sudo apt-get install -y -qq -o Acquire::Retries=3 poppler-utils && exit 0
-            sleep 20
-          done
-          exit 1
+      - name: Install Python packages (no apt/system packages, so an Ubuntu mirror outage can't fail the run)
+        run: pip install -q --retries 5 beautifulsoup4 lxml curl_cffi pymupdf
       - name: Restore previous data ("Changed today" baseline, Senate cache, House summary-PDF text cache, optional Grok summaries)
         continue-on-error: true
         run: |

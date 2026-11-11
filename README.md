@@ -12,7 +12,7 @@ A card dashboard of every House and Senate bill and joint resolution, built like
 | `.github/workflows/update.yml` | Hourly January–May, daily in December, plus manual run. Prepared, not pushed. |
 | `tests/` | Offline parser tests using archived (March 2025) copies of the official hearing pages. |
 
-Run locally: `pip install beautifulsoup4 lxml curl_cffi` (and `poppler-utils` for House summary PDFs), then
+Run locally: `pip install beautifulsoup4 lxml curl_cffi pymupdf`, then
 `python3 -m fetcher.fetch && python3 build_page.py && cd site && python3 -m http.server` → http://localhost:8000
 (`?theme=dark`, `?tab=moving|cal|house|senate|jr` work in the URL).
 
@@ -35,7 +35,7 @@ Default list in `config.json` → `key_bills`. Anyone can star/unstar on a card;
 Each card shows the chamber's own published summary for the bill's most current version, labeled with that version
 (Introduced, Committee, Perfected, Senate Substitute, Truly Agreed and Finally Passed, …). Text is not rewritten.
 - House: the latest summary PDF listed in the bill's XML (`documents.house.mo.gov/billtracking/bills{code}/sumpdf/…`), converted with
-  `pdftotext -layout`, paragraphs kept. PDF text is cached by URL (`site/data/official_summaries_cache.json`), so only new versions download.
+  PyMuPDF (falls back to `pdftotext -layout`), paragraphs kept. PDF text is cached by URL (`site/data/official_summaries_cache.json`), so only new versions download.
 - Senate: the first (current) entry of the bill's Summaries panel on senate.mo.gov.
 The card shows a short preview; "Read full summary" loads the complete text from `site/data/summaries-full.json` (loaded only on first
 expand) and links to the official PDF / Senate bill page. `?open=HB1696` in the URL opens one bill's summary.

@@ -18,12 +18,11 @@ def house_summary_text(url):
         pdf = get(url, binary=True)
     except Exception:
         return ""
-    with tempfile.NamedTemporaryFile(suffix=".pdf") as f:
-        f.write(pdf); f.flush()
-        try:
-            return subprocess.run(["pdftotext", "-layout", f.name, "-"], capture_output=True, text=True, timeout=60).stdout
-        except Exception:
-            return ""
+    try:
+        from .official_summaries import pdf_to_paragraphs
+        return pdf_to_paragraphs(pdf)
+    except Exception:
+        return ""
 
 
 def official_text(bill):
