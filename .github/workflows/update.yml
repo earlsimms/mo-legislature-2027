@@ -1,0 +1,51 @@
+# Refreshes site/data/bills.json from house.mo.gov + senate.mo.gov and deploys site/ to the gh-pages branch
+# (GitHub Pages source: gh-pages / root), the same way as earlsimms/mo-election-night-2026.
+#
+# Schedule (GitHub cron is UTC):
+#   - hourly at :17 during session months, January through May (the House asks scripts not to poll more than every 30 min)
+#   - once a day in December, for prefiled bills
+#   - plus a run on every push to main and on manual "Run workflow"
+# Outside those months nothing runs on a schedule, so GitHub never sends "run failed" email in the off-season.
+# Every fetch step is tolerant (a down website keeps the last good data and is listed in the page's Data sources table),
+# so a run only fails if GitHub itself can't deploy.
+name: update-bills
+on:
+  push: {branches: [main]}   # deploy right after code/config changes (same as the election site)
+  workflow_dispatch:
+  schedule:
+    - cron: "17 * * 1-5 *"
+    - cron: "17 13 * 12 *"
+concurrency: {group: bills, cancel-in-progress: false}
+permissions: {contents: write}
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 1}
+      - name: Install
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils && pip install -q beautifulsoup4 lxml curl_cffi
+      - name: Restore previous data ("Changed today" baseline, Senate cache, House summary-PDF text cache, optional Grok summaries)
+        continue-on-error: true
+        run: |
+          git fetch -q --depth 1 origin gh-pages || exit 0
+          mkdir -p site/data
+          git show origin/gh-pages:data/full.json > site/data/full.json || rm -f site/data/full.json
+          git show origin/gh-pages:data/summaries.json > site/data/summaries.json || rm -f site/data/summaries.json
+          git show origin/gh-pages:data/official_summaries_cache.json > site/data/official_summaries_cache.json || rm -f site/data/official_summaries_cache.json
+      - name: Fetch bills
+        continue-on-error: true
+        env:
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}   # optional; only used if summaries.enabled is true in config.json
+        run: python3 -m fetcher.fetch || true
+      - name: Build page
+        run: python3 build_page.py
+      - name: Deploy to gh-pages
+        run: |
+          test -s site/data/bills.json || { echo "no data yet; skipping deploy"; exit 0; }
+          rm -rf /tmp/out && cp -r site /tmp/out && rm -f /tmp/out/template.html && touch /tmp/out/.nojekyll
+          cd /tmp/out && git init -q -b gh-pages && git add -A
+          git -c user.name=bills-bot -c user.email=bills-bot@users.noreply.github.com commit -qm "deploy $(date -u +%FT%TZ)"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" gh-pages
+      # Daily digest email (optional, off by default). See README "Daily digest" for how to turn it on.
